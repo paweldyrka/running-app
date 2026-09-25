@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kalkulator biegu</title>
+
+  <style>
+  body {
+    font-family: Arial, sans-serif;
+    max-width: 400px;
+    margin: 40px auto;
+    padding: 20px;
+  }
+
+  h1 {
+    text-align: center;
+  }
+
+  div {
+    margin-bottom: 20px;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+
+  input {
+    width: 100%;
+    padding: 12px;
+    font-size: 18px;
+    box-sizing: border-box;
+  }
+
+  button {
+    width: 100%;
+    padding: 14px;
+    font-size: 18px;
+    margin-bottom: 18px;
+  }
+</style>
+
+
+  
+</head>
+<body>
+
+  <h1>Kalkulator biegu</h1>
+
+  <div>
+  <label>Tempo (min/km)</label>
+  <input id="pace" type="text" inputmode="numeric" placeholder="np. 5:30" maxlength="5"
+         oninput="clearPreviousResult('pace')">
+</div>
+
+<div>
+  <label>Dystans (km)</label>
+  <input id="distance" type="text" inputmode="decimal" placeholder="np. 10"
+         oninput="limitDistanceDecimals(this); clearPreviousResult('distance')">
+</div>
+
+<div>
+  <label>Czas</label>
+  <input id="time" type="text" inputmode="numeric" placeholder="np. 55:00"
+         oninput="clearPreviousResult('time')">
+</div>
+
+<button onclick="calculate()">Oblicz</button>
+
+<button onclick="clearFields()">Wyczyść</button>
+
+<script>
+
+  let resultField = null;
+
+  function clearPreviousResult(changedField) {
+  if (resultField !== null && changedField !== resultField) {
+    document.getElementById(resultField).value = "";
+    resultField = null;
+  }
+}
+
+  function limitDistanceDecimals(input) {
+  let value = input.value.replace(",", ".");
+
+  if (!/^\d*\.?\d{0,2}$/.test(value)) {
+    value = value.slice(0, -1);
+  }
+
+  input.value = value;
+}
+
+  function clearFields() {
+    document.getElementById("pace").value = "";
+    document.getElementById("distance").value = "";
+    document.getElementById("time").value = "";
+}
+
+  function calculate() {
+  const pace = document.getElementById("pace").value;
+  const distance = document.getElementById("distance").value;
+  const time = document.getElementById("time").value;
+
+  const filledFields = [pace, distance, time].filter(value => value !== "").length;
+
+  if (filledFields !== 2) {
+    alert("Wpisz dokładnie dwa z trzech parametrów.");
+    return;
+  }
+
+  let paceInSeconds = null;
+  let distanceNumber = null;
+  let timeInSeconds = null;
+
+  if (pace !== "") {
+    if (!/^\d{1,2}:[0-5]\d$/.test(pace)) {
+      alert("Wpisz tempo w formacie min:sek, np. 5:30");
+      return;
+    }
+
+    const parts = pace.split(":");
+    const minutes = Number(parts[0]);
+    const seconds = Number(parts[1]);
+
+    paceInSeconds = minutes * 60 + seconds;
+  }
+
+  if (distance !== "") {
+    distanceNumber = Number(distance);
+
+    if (distanceNumber <= 0) {
+      alert("Wpisz dystans większy od 0 km.");
+      return;
+    }
+  }
+
+  if (time !== "") {
+    if (!/^\d+:[0-5]\d$/.test(time)) {
+      alert("Wpisz czas w formacie min:sek, np. 55:00");
+      return;
+    }
+
+    const parts = time.split(":");
+    const minutes = Number(parts[0]);
+    const seconds = Number(parts[1]);
+
+    timeInSeconds = minutes * 60 + seconds;
+  }
+
+  // Tempo + dystans = czas
+  if (pace !== "" && distance !== "") {
+    const totalSeconds = Math.round(paceInSeconds * distanceNumber);
+
+    const resultMinutes = Math.floor(totalSeconds / 60);
+    const resultSeconds = totalSeconds % 60;
+
+    document.getElementById("time").value =
+      resultMinutes + ":" + String(resultSeconds).padStart(2, "0");
+      resultField = "time";
+  }
+
+  // Dystans + czas = tempo
+  if (distance !== "" && time !== "") {
+    const resultPaceSeconds = Math.round(timeInSeconds / distanceNumber);
+
+    const resultMinutes = Math.floor(resultPaceSeconds / 60);
+    const resultSeconds = resultPaceSeconds % 60;
+
+    document.getElementById("pace").value =
+      resultMinutes + ":" + String(resultSeconds).padStart(2, "0");
+      resultField = "pace";
+  }
+
+  // Tempo + czas = dystans
+  if (pace !== "" && time !== "") {
+    const resultDistance = timeInSeconds / paceInSeconds;
+
+    document.getElementById("distance").value =
+      resultDistance.toFixed(2);
+      resultField = "distance";
+  }
+}
+
+document.addEventListener("keydown", function(event) {
+  if (event.key === "Enter") {
+    calculate();
+  }
+});
+</script>
+
+</body>
+</html>
