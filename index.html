@@ -6,6 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kalkulator biegu</title>
 
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#007aff">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
   
 <style>
   body {
@@ -228,7 +232,7 @@
     function calculate() {
       formatPaceInput(document.getElementById("pace"));
       formatTimeInput(document.getElementById("time"));
-      
+
       const pace = document.getElementById("pace").value.trim();
       const distance = document.getElementById("distance").value.trim();
       const time = document.getElementById("time").value.trim();
@@ -367,6 +371,20 @@
         calculate();
       }
     });
+
+    
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function() {
+      navigator.serviceWorker.register("./service-worker.js")
+        .then(function() {
+          console.log("Service Worker zarejestrowany");
+        })
+        .catch(function(error) {
+          console.log("Błąd Service Workera:", error);
+        });
+    });
+  }
+
   </script>
 
 </body>

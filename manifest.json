@@ -1,0 +1,24 @@
+
+{
+  "name": "Kalkulator biegu",
+  "short_name": "Bieganie",
+  "description": "Kalkulator tempa, dystansu i czasu biegu",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f5f5",
+  "theme_color": "#007aff",
+  "lang": "pl",
+  "icons": [
+        {
+        "src": "icon-192.png",
+        "sizes": "192x192",
+        "type": "image/png"
+        },
+        {
+        "src": "icon-512.png",
+        "sizes": "512x512",
+        "type": "image/png"
+        }
+    ]  
+}
