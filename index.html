@@ -92,10 +92,11 @@
     <input
       id="pace"
       type="text"
-      inputmode="text"
+      inputmode="numeric"
       placeholder="np. 5:30"
       maxlength="5"
       oninput="clearPreviousResult('pace')"
+      onblur="formatPaceInput(this)"
     >
   </div>
 
@@ -115,9 +116,10 @@
     <input
       id="time"
       type="text"
-      inputmode="text"
-      placeholder="np. 55:00 lub 1:05:30"
+      inputmode="numeric"
+      placeholder="np. 5500 lub 10530"
       oninput="clearPreviousResult('time')"
+      onblur="formatTimeInput(this)"
     >
   </div>
 
@@ -177,8 +179,56 @@
       return minutes + ":" + String(seconds).padStart(2, "0");
     }
 
+    function formatPaceInput(input) {
+      const value = input.value.trim();
+
+    // Jeżeli użytkownik wpisał dwukropek, nic nie zmieniamy
+      if (value.includes(":")) {
+        return;
+      }
+
+    // Akceptujemy tylko 3 lub 4 cyfry
+      if (!/^\d{3,4}$/.test(value)) {
+        return;
+      }
+
+      // Ostatnie dwie cyfry traktujemy jako sekundy
+      const minutes = value.slice(0, -2);
+      const seconds = value.slice(-2);
+
+      input.value = Number(minutes) + ":" + seconds;
+    }
+
+    function formatTimeInput(input) {
+      const value = input.value.trim();
+
+      // Jeśli czas ma już dwukropek, nic nie zmieniamy
+      if (value.includes(":")) {
+        return;
+      }
+
+      // Akceptujemy od 3 do 6 cyfr
+      if (!/^\d{3,6}$/.test(value)) {
+        return;
+      }
+
+      const seconds = value.slice(-2);
+      const minutes = value.slice(-4, -2);
+      const hours = value.slice(0, -4);
+
+      if (hours !== "") {
+        input.value = Number(hours) + ":" +
+          minutes + ":" + seconds;
+      } else {
+        input.value = Number(minutes) + ":" + seconds;
+      }
+    }
+
     // Główna funkcja kalkulatora
     function calculate() {
+      formatPaceInput(document.getElementById("pace"));
+      formatTimeInput(document.getElementById("time"));
+      
       const pace = document.getElementById("pace").value.trim();
       const distance = document.getElementById("distance").value.trim();
       const time = document.getElementById("time").value.trim();
@@ -310,6 +360,10 @@
     document.addEventListener("keydown", function(event) {
       if (event.key === "Enter") {
         event.preventDefault();
+
+        formatPaceInput(document.getElementById("pace"));
+        formatTimeInput(document.getElementById("time"));
+
         calculate();
       }
     });
