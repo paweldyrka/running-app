@@ -120,6 +120,31 @@
     font-weight: 520;
   }
 
+  /* Etykieta obliczonego wyniku */
+
+  .result-label {
+    display: none;
+    color: #c9ff45;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .result-label.visible {
+    display: inline;
+  }
+
+  .field-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  .field-heading label {
+    margin-bottom: 0;
+  }
+
   input::placeholder {
     color: #82919e;
     font-weight: 400;
@@ -199,20 +224,26 @@
 </header>
 
   <div>
-    <label for="pace">Tempo (min/km)</label>
+    <div class="field-heading">
+      <label for="pace">Tempo (min/km)</label>
+      <span id="pace-result-label" class="result-label">✓ WYNIK</span>
+    </div>
     <input
-      id="pace"
-      type="text"
-      inputmode="numeric"
-      placeholder="np. 5:30"
-      maxlength="5"
-      oninput="clearPreviousResult('pace')"
-      onblur="formatPaceInput(this)"
-    >
+        id="pace"
+        type="text"
+        inputmode="numeric"
+        placeholder="np. 5:30"
+        maxlength="5"
+        oninput="clearPreviousResult('pace')"
+        onblur="formatPaceInput(this)"
+      >
   </div>
 
   <div>
-    <label for="distance">Dystans (km)</label>
+    <div class="field-heading">
+      <label for="distance">Dystans (km)</label>
+      <span id="distance-result-label" class="result-label">✓ WYNIK</span>
+    </div>
     <input
       id="distance"
       type="text"
@@ -223,7 +254,11 @@
   </div>
 
   <div>
-    <label for="time">Czas</label>
+    <div class="field-heading">
+      <label for="time">Czas</label>
+      <span id="time-result-label" class="result-label">✓ WYNIK</span>
+    </div>
+ 
     <input
       id="time"
       type="text"
@@ -242,11 +277,22 @@
     let resultField = null;
 
     function highlightResult(fieldId) {
+      // Usuwamy poprzednie podświetlenia
       document.querySelectorAll("input").forEach(function(input) {
         input.classList.remove("result");
       });
 
+      // Ukrywamy wszystkie etykiety WYNIK
+      document.querySelectorAll(".result-label").forEach(function(label) {
+        label.classList.remove("visible");
+      });
+
+      // Podświetlamy obliczony parametr
       document.getElementById(fieldId).classList.add("result");
+
+      // Pokazujemy etykietę WYNIK
+      document.getElementById(fieldId + "-result-label")
+        .classList.add("visible");
     }
 
     // Usuwamy poprzedni wynik po zmianie danych wejściowych
@@ -262,6 +308,10 @@
 
       document.querySelectorAll("input").forEach(function(input) {
         input.classList.remove("result");
+      });
+
+      document.querySelectorAll(".result-label").forEach(function(label) {
+        label.classList.remove("visible");
       });
     }
 
@@ -285,6 +335,9 @@
       resultField = null;
       document.querySelectorAll("input").forEach(function(input) {
         input.classList.remove("result");
+      });
+      document.querySelectorAll(".result-label").forEach(function(label) {
+        label.classList.remove("visible");
       });
     }
 

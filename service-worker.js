@@ -1,5 +1,5 @@
 
-const CACHE_NAME = "running-app-v2";
+const CACHE_NAME = "running-app-v3";
 
 const FILES_TO_CACHE = [
   "./",
@@ -39,7 +39,7 @@ self.addEventListener("activate", function(event) {
   self.clients.claim();
 });
 
-// Obsługa żądań plików
+// Obsługa żądań plików - strategia network-first
 self.addEventListener("fetch", function(event) {
   if (event.request.method !== "GET") {
     return;
@@ -47,9 +47,21 @@ self.addEventListener("fetch", function(event) {
 
   if (event.request.url.startsWith(self.registration.scope)) {
     event.respondWith(
-      caches.match(event.request).then(function(response) {
-        return response || fetch(event.request);
-      })
+      fetch(event.request)
+        .then(function(response) {
+          if (response.ok) {
+            const responseCopy = response.clone();
+
+            caches.open(CACHE_NAME).then(function(cache) {
+              cache.put(event.request, responseCopy);
+            });
+          }
+
+          return response;
+        })
+        .catch(function() {
+          return caches.match(event.request);
+        })
     );
   }
 });
